@@ -19,7 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 public class OrderService {
-    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
 
     private final OrderRepository orderRepository;
     public void placeOrder(OrderRequest orderRequest){
@@ -33,7 +33,7 @@ public class OrderService {
       List<String> skuCodes= order.getOrderLineItemsList().stream().map(OrderLineItems::getSkuCode).toList();
 
      //Call Inventory service and place order if product exist
-       InventoryResponse[] inventoryResponses= webClient.get().uri("http://localhost:8000/api/inventory",uriBuilder -> uriBuilder.queryParam("skuCode",skuCodes).build())
+       InventoryResponse[] inventoryResponses= webClientBuilder.build().get().uri("http://inventory-service/api/inventory",uriBuilder -> uriBuilder.queryParam("skuCode",skuCodes).build())
                         .retrieve()
                                 .bodyToMono(InventoryResponse[].class)
                                         .block();
